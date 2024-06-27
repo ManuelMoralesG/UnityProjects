@@ -11,13 +11,16 @@ public class BobOmbControl : MonoBehaviour
     [SerializeField] private float direction = 0.0f;
     private float BlackOrPink = 0;
     private SpriteRenderer SR;
+    [SerializeField] private GameObject Spawner;
+    private Logic logic;
 
     void Start() {
         SR = GetComponent<SpriteRenderer>();
 
+        // Determina si la bomba será color negro o rosa
         BlackOrPink = Random.Range(0, 2);
         if (BlackOrPink == 0) {
-            gameObject.tag = "PinkBobOmb";
+            gameObject.tag = "BlackBobOmb";
             SR.color = Color.black;
         } else if (BlackOrPink == 1) {
             gameObject.tag = "PinkBobOmb";
@@ -27,10 +30,11 @@ public class BobOmbControl : MonoBehaviour
         direction = Random.Range(0, 4);
         RB2D = GetComponent<Rigidbody2D>();
         CC2D = GetComponent<CircleCollider2D>();
+        logic = Spawner.GetComponent<Logic>();
     }
     void Update()
     {   
-        // Dragging controls
+        // Controles para arrastrar las bombas
         if (dragging){
             if (draggable) {
                 Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -43,6 +47,7 @@ public class BobOmbControl : MonoBehaviour
     }
 
     void FixedUpdate() {
+        // Está funcion se ejecuta cada frame
         GoBobOmb();
     }
 
@@ -85,6 +90,7 @@ public class BobOmbControl : MonoBehaviour
         set { bobOmbVelocity = value; }
     }
     public void GoBobOmb() {
+        // Controla hacia donde se moveran las bombas
         switch (direction){
             case 0:
                 RB2D.velocity = new Vector2(bobOmbVelocity, bobOmbVelocity);
@@ -101,6 +107,7 @@ public class BobOmbControl : MonoBehaviour
         }
     }
 
+    // Controla las colisiones de las bombas
     void OnTriggerEnter2D(Collider2D collision) {
         if (collision.gameObject.CompareTag("Top")) {
             if (direction == 0) {
@@ -138,12 +145,39 @@ public class BobOmbControl : MonoBehaviour
             
         }
 
+        // Control de que pasa cuando una bomba es arrastrada a su repectiva caja
         if (collision.gameObject.CompareTag("BlackBox")) {
-            draggable = false;
+            if (gameObject.CompareTag("BlackBobOmb")) {
+                gameObject.transform.localPosition = new Vector2(5.85f,0.25f);
+                draggable = false;
+                logic.publicNoBobOmbsInBlack += 1;
+            } else {
+                if (!logic.isGameOver)
+                {
+                    logic.GameOver();
+                }
+            }
+
+            if (logic.publicNoBobOmbsInBlack >= 15) {
+                Destroy(gameObject);
+            }
         }
 
         if (collision.gameObject.CompareTag("PinkBox")) {
-            draggable = false;
+            if (gameObject.CompareTag("PinkBobOmb")) {
+                gameObject.transform.localPosition = new Vector2(-5.85f,0.25f);
+                draggable = false;
+                logic.publicNoBobOmbsInPink += 1;
+            } else {
+                if (!logic.isGameOver)
+                {
+                    logic.GameOver();
+                }
+            }
+
+            if (logic.publicNoBobOmbsInPink >= 15) {
+                Destroy(gameObject);
+            }
         }
 
     }

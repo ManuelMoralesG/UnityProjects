@@ -12,9 +12,8 @@ TagManager:
   - BlackBobOmb
   - PinkBobOmb
   - BobOmb
-  - TopSpawner
-  - BottomSpawner
   - PinkBox
+  - Spawner
   layers:
   - Default
   - TransparentFX

@@ -1,19 +1,39 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 
 public class Logic : MonoBehaviour
 {
     [SerializeField] private GameObject BobOmb;
+    private BobOmbControl bobOmbControl;
     private float spawnInterval = 4f;
     private float time = 0.0f;
-    private BobOmbControl bobOmbControl;
+    private int noBobOmbsInBlack = 0;
+    public int publicNoBobOmbsInBlack
+    {
+        get { return noBobOmbsInBlack; }
+        set { noBobOmbsInBlack = value; }
+    }
+    private int noBobOmbsInPink = 0;
+    public int publicNoBobOmbsInPink
+    {
+        get { return noBobOmbsInPink; }
+        set { noBobOmbsInPink = value; }
+    }
+
+    public GameObject GameOverMenuUI;
+    [SerializeField]
+    private TMP_Text ScoreDisplay;
+    public bool isGameOver = false;
 
     // Start is called before the first frame update
     void Start()
     {
         StartCoroutine(spawnBobOmb(spawnInterval, BobOmb));
-        bobOmbControl = BobOmb.GetComponent<BobOmbControl>(); // Get reference to BobOmbControl
+        bobOmbControl = BobOmb.GetComponent<BobOmbControl>();
+        GameOverMenuUI.SetActive(false);
     }
 
     // Update is called once per frame
@@ -42,15 +62,44 @@ public class Logic : MonoBehaviour
             Interval = 3.2f;
         }
 
-        if (gameObject.CompareTag("TopSpawner") && time >= 15.0f)
+        if (time >= 15.0f)
         {
-            GameObject newBobOmb = Instantiate(BobOmb, new Vector3(0.0462f, 4.03f, 0), Quaternion.identity);
+            Instantiate(BobOmb, new Vector3(0.0462f, 4.03f, 0), Quaternion.identity);
         }
-        else if (gameObject.CompareTag("BottomSpawner"))
-        {
-            GameObject newBobOmb = Instantiate(BobOmb, new Vector3(0.0462f, -4.03f, 0), Quaternion.identity);
-        }
+
+        Instantiate(BobOmb, new Vector3(0.0462f, -4.03f, 0), Quaternion.identity);
+        
         StartCoroutine(spawnBobOmb(Interval, BobOmb));
-        Debug.Log(gameObject.tag);
+    }
+
+    public int GameOver() {
+        if (isGameOver) return 0;
+
+        isGameOver = true;
+
+        GameObject[] BlackBobOmbs = GameObject.FindGameObjectsWithTag("BlackBobOmb");
+        foreach(GameObject bomb in BlackBobOmbs) {
+            GameObject.Destroy(bomb);
+        }
+
+        GameObject[] PinkBobOmbs = GameObject.FindGameObjectsWithTag("PinkBobOmb");
+        foreach(GameObject bomb in PinkBobOmbs) {
+            GameObject.Destroy(bomb);
+        }
+
+        Debug.Log("Game Over");
+
+        StartCoroutine(ShowGameOverUI(1));
+        
+
+        Time.timeScale = 0f;
+        return noBobOmbsInBlack + noBobOmbsInPink - 1;
+    }
+
+    private IEnumerator ShowGameOverUI(float time) {
+        yield return new WaitForSecondsRealtime(time);
+
+        ScoreDisplay.text = "Score: " + (noBobOmbsInBlack + noBobOmbsInPink).ToString();
+        GameOverMenuUI.SetActive(true);
     }
 }
