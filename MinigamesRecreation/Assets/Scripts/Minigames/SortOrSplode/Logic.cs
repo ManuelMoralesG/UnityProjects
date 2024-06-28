@@ -1,14 +1,17 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
+using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.SceneManagement; 
 
 public class Logic : MonoBehaviour
 {
     [SerializeField] private GameObject BobOmb;
     private BobOmbControl bobOmbControl;
-    private float spawnInterval = 4f;
+    private float spawnInterval = 4.5f;
     private float time = 0.0f;
     private int noBobOmbsInBlack = 0;
     public int publicNoBobOmbsInBlack
@@ -24,16 +27,20 @@ public class Logic : MonoBehaviour
     }
 
     public GameObject GameOverMenuUI;
-    [SerializeField]
-    private TMP_Text ScoreDisplay;
+    public GameObject PauseMenuUI;
+    [SerializeField] private TMP_Text ScoreDisplay;
+    [SerializeField] private TMP_Text TimeDisplay;
     public bool isGameOver = false;
+    private bool isPaused = false;
 
     // Start is called before the first frame update
     void Start()
     {
         StartCoroutine(spawnBobOmb(spawnInterval, BobOmb));
         bobOmbControl = BobOmb.GetComponent<BobOmbControl>();
+
         GameOverMenuUI.SetActive(false);
+        PauseMenuUI.SetActive(false);
     }
 
     // Update is called once per frame
@@ -41,12 +48,30 @@ public class Logic : MonoBehaviour
     {
         time += 1 * Time.deltaTime;
 
-        if (time >= 25) {
-            bobOmbControl.publicBobOmbVelocity = 4.0f;
+        TimeDisplay.text = Math.Round((decimal)time, 2).ToString();
+
+        if (time >= 15) {
+            bobOmbControl.publicBobOmbVelocity = 2.0f;
+        }
+
+        if (time >= 30) {
+            bobOmbControl.publicBobOmbVelocity = 2.5f;
         }
 
         if (time >= 60) {
-            bobOmbControl.publicBobOmbVelocity = 4.5f;
+            bobOmbControl.publicBobOmbVelocity = 3.0f;
+        }
+
+        // Pausar el juego
+        if (Input.GetKeyDown(KeyCode.Escape)) 
+        {
+            if (!isPaused) {
+                Time.timeScale = 0f;
+                PauseMenuUI.SetActive(true);
+                isPaused = true;
+            } else if  (isPaused) {
+                Resume();
+            }
         }
     }
 
@@ -55,19 +80,25 @@ public class Logic : MonoBehaviour
         yield return new WaitForSeconds(Interval);
 
         if (time >= 40) {
-            Interval = 3.5f;
+            Interval = 4.1f;
         }
 
-        if (time >= 90) {
-            Interval = 3.2f;
-        }
-
-        if (time >= 15.0f)
+        if (time >= 15)
         {
             Instantiate(BobOmb, new Vector3(0.0462f, 4.03f, 0), Quaternion.identity);
         }
 
         Instantiate(BobOmb, new Vector3(0.0462f, -4.03f, 0), Quaternion.identity);
+
+        if (time >= 50) {
+            Instantiate(BobOmb, new Vector3(0.0462f, 4.03f, 0), Quaternion.identity);
+            Instantiate(BobOmb, new Vector3(0.0462f, -4.03f, 0), Quaternion.identity);
+        }
+
+        if (time >= 90) {
+            Instantiate(BobOmb, new Vector3(0.0462f, 4.03f, 0), Quaternion.identity);
+            Instantiate(BobOmb, new Vector3(0.0462f, -4.03f, 0), Quaternion.identity);
+        }
         
         StartCoroutine(spawnBobOmb(Interval, BobOmb));
     }
@@ -87,11 +118,8 @@ public class Logic : MonoBehaviour
             GameObject.Destroy(bomb);
         }
 
-        Debug.Log("Game Over");
-
         StartCoroutine(ShowGameOverUI(1));
         
-
         Time.timeScale = 0f;
         return noBobOmbsInBlack + noBobOmbsInPink - 1;
     }
@@ -101,5 +129,22 @@ public class Logic : MonoBehaviour
 
         ScoreDisplay.text = "Score: " + (noBobOmbsInBlack + noBobOmbsInPink).ToString();
         GameOverMenuUI.SetActive(true);
+    }
+
+    // Controla el menu de pausa y gameover
+    public void Retry() {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("SortOrSplode");
+    }
+
+    public void GoToMenu() {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("MinigameSelection"); 
+    }
+
+    public void Resume() {
+        Time.timeScale = 1f;
+        PauseMenuUI.SetActive(false);
+        isPaused = false;
     }
 }

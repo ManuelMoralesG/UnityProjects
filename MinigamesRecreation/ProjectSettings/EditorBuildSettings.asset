@@ -11,4 +11,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/MinigameSelection.unity
     guid: 0ef578c1415684e49becaa3999157e5e
+  - enabled: 1
+    path: Assets/Scenes/Minigames/SortOrSplode.unity
+    guid: f47683bf6faf9c44cafe8f8e4fb4eda7
   m_configObjects: {}

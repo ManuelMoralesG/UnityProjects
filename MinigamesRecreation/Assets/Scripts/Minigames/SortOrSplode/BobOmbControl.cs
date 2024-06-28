@@ -1,3 +1,5 @@
+using System;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -13,12 +15,17 @@ public class BobOmbControl : MonoBehaviour
     private SpriteRenderer SR;
     [SerializeField] private GameObject Spawner;
     private Logic logic;
+    public float limitTime = 13f;
+    private bool isSaved = false;
+    private new Light light;
+    [SerializeField] private TMP_Text ScoreInGameDisplay;
+
 
     void Start() {
         SR = GetComponent<SpriteRenderer>();
 
         // Determina si la bomba será color negro o rosa
-        BlackOrPink = Random.Range(0, 2);
+        BlackOrPink = UnityEngine.Random.Range(0, 2);
         if (BlackOrPink == 0) {
             gameObject.tag = "BlackBobOmb";
             SR.color = Color.black;
@@ -27,9 +34,12 @@ public class BobOmbControl : MonoBehaviour
             SR.color = new Color(222f / 255f, 31f / 255f, 103f / 255f, 1f);
         }
 
-        direction = Random.Range(0, 4);
+        direction = UnityEngine.Random.Range(0, 4);
+
         RB2D = GetComponent<Rigidbody2D>();
         CC2D = GetComponent<CircleCollider2D>();
+        light = GetComponent<Light>();
+
         logic = Spawner.GetComponent<Logic>();
     }
     void Update()
@@ -44,6 +54,27 @@ public class BobOmbControl : MonoBehaviour
         }
 
         RB2D.constraints = RigidbodyConstraints2D.FreezeRotation;
+
+        // Se asegura que la bomba principal no explote y que las bombas que esten siendo arrastradas no exploten
+        if (gameObject.transform.position.x > -15 && !dragging) {
+            limitTime -= Time.deltaTime;
+        }
+
+        // Cambia de color cuando esta cerca de explotar
+        if (limitTime <= 4.5f) {
+            if (!isSaved) {
+                light.enabled = true;
+            }
+        }
+
+        // Ejecuta GameOver cuando la bomba lleva x tiempo si ser guardada
+        if (limitTime <= 0.0f) {
+            limitTime -= 0;
+
+            if (!logic.isGameOver && !isSaved) {
+                logic.GameOver();
+            }
+        }
     }
 
     void FixedUpdate() {
@@ -62,27 +93,19 @@ public class BobOmbControl : MonoBehaviour
             
             RB2D.velocity = Vector2.zero;
             CC2D.enabled = false;
-            SetAllCollidersStatus(false);
         }
     }
 
     private void OnMouseUp(){
         if (draggable) {
             dragging = false;
-            direction = Random.Range(0, 4);
+            direction = UnityEngine.Random.Range(0, 4);
             CC2D.enabled = true;
-            SetAllCollidersStatus(true);
         }
     }
 
-    public void SetAllCollidersStatus (bool active) {
-        foreach(var c in gameObject.GetComponentsInChildren<BoxCollider2D>()) {
-            c.enabled = active;
-        }
-    }
-
-    [SerializeField]
-    private float bobOmbVelocity = 1.5f;
+    
+    public float bobOmbVelocity = 1.0f;
 
     public float publicBobOmbVelocity
     {
@@ -151,9 +174,11 @@ public class BobOmbControl : MonoBehaviour
                 gameObject.transform.localPosition = new Vector2(5.85f,0.25f);
                 draggable = false;
                 logic.publicNoBobOmbsInBlack += 1;
+                isSaved = true;
+                light.enabled = false;
+                ScoreInGameDisplay.text = (int.Parse(ScoreInGameDisplay.text) + 1).ToString(); 
             } else {
-                if (!logic.isGameOver)
-                {
+                if (!logic.isGameOver) {
                     logic.GameOver();
                 }
             }
@@ -168,9 +193,11 @@ public class BobOmbControl : MonoBehaviour
                 gameObject.transform.localPosition = new Vector2(-5.85f,0.25f);
                 draggable = false;
                 logic.publicNoBobOmbsInPink += 1;
+                isSaved = true;
+                light.enabled = false;
+                ScoreInGameDisplay.text = (int.Parse(ScoreInGameDisplay.text) + 1).ToString(); 
             } else {
-                if (!logic.isGameOver)
-                {
+                if (!logic.isGameOver) {
                     logic.GameOver();
                 }
             }
