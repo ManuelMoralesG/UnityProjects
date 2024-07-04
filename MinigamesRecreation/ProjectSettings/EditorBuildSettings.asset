@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Minigames/SortOrSplode.unity
     guid: f47683bf6faf9c44cafe8f8e4fb4eda7
+  - enabled: 1
+    path: Assets/Scenes/Minigames/PicturePoker.unity
+    guid: 2ad48151556247840bbecbc4b805aa56
   m_configObjects: {}

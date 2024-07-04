@@ -5,20 +5,22 @@ using UnityEngine;
 
 public class BobOmbControl : MonoBehaviour
 {   
+    private Rigidbody2D RB2D;
+    private CircleCollider2D CC2D;
+    private SpriteRenderer SR;
+    private new Light light;
+    [SerializeField] private TMP_Text ScoreInGameDisplay;
+    [SerializeField] private GameObject Spawner;
+    private Logic logic;
+
     private bool dragging = false;
     [SerializeField] private bool draggable = true;
     private Vector3 offset;
-    private Rigidbody2D RB2D;
-    private CircleCollider2D CC2D;
+
     [SerializeField] private float direction = 0.0f;
     private float BlackOrPink = 0;
-    private SpriteRenderer SR;
-    [SerializeField] private GameObject Spawner;
-    private Logic logic;
-    public float limitTime = 13f;
-    private bool isSaved = false;
-    private new Light light;
-    [SerializeField] private TMP_Text ScoreInGameDisplay;
+    public float timeBeforeExploding = 13f;
+    private bool isInBox = false;
 
 
     void Start() {
@@ -34,6 +36,7 @@ public class BobOmbControl : MonoBehaviour
             SR.color = new Color(222f / 255f, 31f / 255f, 103f / 255f, 1f);
         }
 
+        // Direccion con la que la bomba "spawneara"
         direction = UnityEngine.Random.Range(0, 4);
 
         RB2D = GetComponent<Rigidbody2D>();
@@ -42,6 +45,7 @@ public class BobOmbControl : MonoBehaviour
 
         logic = Spawner.GetComponent<Logic>();
     }
+
     void Update()
     {   
         // Controles para arrastrar las bombas
@@ -57,28 +61,28 @@ public class BobOmbControl : MonoBehaviour
 
         // Se asegura que la bomba principal no explote y que las bombas que esten siendo arrastradas no exploten
         if (gameObject.transform.position.x > -15 && !dragging) {
-            limitTime -= Time.deltaTime;
+            timeBeforeExploding -= Time.deltaTime;
         }
 
         // Cambia de color cuando esta cerca de explotar
-        if (limitTime <= 4.5f) {
-            if (!isSaved) {
+        if (timeBeforeExploding <= 4.5f) {
+            if (!isInBox) {
                 light.enabled = true;
             }
         }
 
         // Ejecuta GameOver cuando la bomba lleva x tiempo si ser guardada
-        if (limitTime <= 0.0f) {
-            limitTime -= 0;
+        if (timeBeforeExploding <= 0.0f) {
+            timeBeforeExploding -= 0;
 
-            if (!logic.isGameOver && !isSaved) {
+            if (!logic.isGameOver && !isInBox) {
                 logic.GameOver();
             }
         }
     }
 
     void FixedUpdate() {
-        // Está funcion se ejecuta cada frame
+        // Este metodo se ejecuta cada frame
         GoBobOmb();
     }
 
@@ -106,12 +110,12 @@ public class BobOmbControl : MonoBehaviour
 
     
     public float bobOmbVelocity = 1.0f;
-
     public float publicBobOmbVelocity
     {
         get { return bobOmbVelocity; }
         set { bobOmbVelocity = value; }
     }
+
     public void GoBobOmb() {
         // Controla hacia donde se moveran las bombas
         switch (direction){
@@ -130,7 +134,7 @@ public class BobOmbControl : MonoBehaviour
         }
     }
 
-    // Controla las colisiones de las bombas
+    // Controla las colisiones de las bombas con otros objetos
     void OnTriggerEnter2D(Collider2D collision) {
         if (collision.gameObject.CompareTag("Top")) {
             if (direction == 0) {
@@ -174,7 +178,7 @@ public class BobOmbControl : MonoBehaviour
                 gameObject.transform.localPosition = new Vector2(5.85f,0.25f);
                 draggable = false;
                 logic.publicNoBobOmbsInBlack += 1;
-                isSaved = true;
+                isInBox = true;
                 light.enabled = false;
                 ScoreInGameDisplay.text = (int.Parse(ScoreInGameDisplay.text) + 1).ToString(); 
             } else {
@@ -193,7 +197,7 @@ public class BobOmbControl : MonoBehaviour
                 gameObject.transform.localPosition = new Vector2(-5.85f,0.25f);
                 draggable = false;
                 logic.publicNoBobOmbsInPink += 1;
-                isSaved = true;
+                isInBox = true;
                 light.enabled = false;
                 ScoreInGameDisplay.text = (int.Parse(ScoreInGameDisplay.text) + 1).ToString(); 
             } else {

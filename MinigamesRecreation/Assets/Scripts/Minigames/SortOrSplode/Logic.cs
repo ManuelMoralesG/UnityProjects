@@ -11,8 +11,10 @@ public class Logic : MonoBehaviour
 {
     [SerializeField] private GameObject BobOmb;
     private BobOmbControl bobOmbControl;
+
     private float spawnInterval = 4.5f;
-    private float time = 0.0f;
+    private float inGameTime = 0.0f;
+
     private int noBobOmbsInBlack = 0;
     public int publicNoBobOmbsInBlack
     {
@@ -26,14 +28,13 @@ public class Logic : MonoBehaviour
         set { noBobOmbsInPink = value; }
     }
 
-    public GameObject GameOverMenuUI;
-    public GameObject PauseMenuUI;
     [SerializeField] private TMP_Text ScoreDisplay;
     [SerializeField] private TMP_Text TimeDisplay;
+    public GameObject GameOverMenuUI;
+    public GameObject PauseMenuUI;
     public bool isGameOver = false;
     private bool isPaused = false;
 
-    // Start is called before the first frame update
     void Start()
     {
         StartCoroutine(spawnBobOmb(spawnInterval, BobOmb));
@@ -43,26 +44,26 @@ public class Logic : MonoBehaviour
         PauseMenuUI.SetActive(false);
     }
 
-    // Update is called once per frame
     void Update()
     {
-        time += 1 * Time.deltaTime;
+        inGameTime += 1 * Time.deltaTime;
 
-        TimeDisplay.text = Math.Round((decimal)time, 2).ToString();
+        TimeDisplay.text = Math.Round((decimal)inGameTime, 2).ToString();
 
-        if (time >= 15) {
+        // Sube la velocidad de las bobas mientras mas tiempo pase
+        if (inGameTime >= 15) {
             bobOmbControl.publicBobOmbVelocity = 2.0f;
         }
 
-        if (time >= 30) {
+        if (inGameTime >= 30) {
             bobOmbControl.publicBobOmbVelocity = 2.5f;
         }
 
-        if (time >= 60) {
+        if (inGameTime >= 60) {
             bobOmbControl.publicBobOmbVelocity = 3.0f;
         }
 
-        // Pausar el juego
+        // Pausa el juego
         if (Input.GetKeyDown(KeyCode.Escape)) 
         {
             if (!isPaused) {
@@ -75,27 +76,31 @@ public class Logic : MonoBehaviour
         }
     }
 
+    // "Spawn" de las bombas
     private IEnumerator spawnBobOmb(float Interval, GameObject BobOmb)
     {
         yield return new WaitForSeconds(Interval);
 
-        if (time >= 40) {
+        // Baja el intervalo de "spawn" despues de x segundos
+        if (inGameTime >= 40) {
             Interval = 4.1f;
-        }
-
-        if (time >= 15)
-        {
-            Instantiate(BobOmb, new Vector3(0.0462f, 4.03f, 0), Quaternion.identity);
         }
 
         Instantiate(BobOmb, new Vector3(0.0462f, -4.03f, 0), Quaternion.identity);
 
-        if (time >= 50) {
+        // Empieza a "spawnear" bombas arriba
+        if (inGameTime >= 15)
+        {
+            Instantiate(BobOmb, new Vector3(0.0462f, 4.03f, 0), Quaternion.identity);
+        }
+
+        // Comienza a spawnear multiples bombas
+        if (inGameTime >= 50) {
             Instantiate(BobOmb, new Vector3(0.0462f, 4.03f, 0), Quaternion.identity);
             Instantiate(BobOmb, new Vector3(0.0462f, -4.03f, 0), Quaternion.identity);
         }
 
-        if (time >= 90) {
+        if (inGameTime >= 90) {
             Instantiate(BobOmb, new Vector3(0.0462f, 4.03f, 0), Quaternion.identity);
             Instantiate(BobOmb, new Vector3(0.0462f, -4.03f, 0), Quaternion.identity);
         }
@@ -103,11 +108,13 @@ public class Logic : MonoBehaviour
         StartCoroutine(spawnBobOmb(Interval, BobOmb));
     }
 
+    // Metodo para cuando el jugador pierda
     public int GameOver() {
         if (isGameOver) return 0;
 
         isGameOver = true;
 
+        // Destruyen todos los objetos con etiquetas BlackBobOmb o Pink BobOmb
         GameObject[] BlackBobOmbs = GameObject.FindGameObjectsWithTag("BlackBobOmb");
         foreach(GameObject bomb in BlackBobOmbs) {
             GameObject.Destroy(bomb);
@@ -118,10 +125,11 @@ public class Logic : MonoBehaviour
             GameObject.Destroy(bomb);
         }
 
+        // Hace que la pantalla de GameOver se muestre
         StartCoroutine(ShowGameOverUI(1));
         
         Time.timeScale = 0f;
-        return noBobOmbsInBlack + noBobOmbsInPink - 1;
+        return 0;
     }
 
     private IEnumerator ShowGameOverUI(float time) {
@@ -131,7 +139,7 @@ public class Logic : MonoBehaviour
         GameOverMenuUI.SetActive(true);
     }
 
-    // Controla el menu de pausa y gameover
+    // Controles para el menu de pausa y gameover
     public void Retry() {
         Time.timeScale = 1f;
         SceneManager.LoadScene("SortOrSplode");
