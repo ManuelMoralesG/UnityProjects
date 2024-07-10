@@ -7,7 +7,7 @@ public class HouseCardAction : MonoBehaviour
     [SerializeField] private GameObject GameLogic;
     private LogicPicturePoker logicPicturePoker;
     private SpriteRenderer SR;
-    public float cardValue;
+    public int cardValue;
     [SerializeField] private Sprite[] spriteList;
 
     void Start()
@@ -18,9 +18,9 @@ public class HouseCardAction : MonoBehaviour
         logicPicturePoker.AddHouseCard(this);
 
         AssignNewValue();
-    }
+    }   
 
-    private void AssignNewValue() {
+    public void AssignNewValue() {
         cardValue = Random.Range(0, 6);
     }
 
@@ -46,5 +46,9 @@ public class HouseCardAction : MonoBehaviour
                 SR.sprite = spriteList[5];
                 break;
         }
+    }
+
+    public void HideCard() {
+        SR.sprite = spriteList[6];
     }
 }

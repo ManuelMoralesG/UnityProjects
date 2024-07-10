@@ -9,7 +9,7 @@ public class PlayerCardAction : MonoBehaviour
     [SerializeField] private GameObject GameLogic;
     private LogicPicturePoker logicPicturePoker;
     private SpriteRenderer SR;
-    public float cardValue;
+    public int cardValue;
     public bool isSelected = false;
     [SerializeField] private Sprite[] spriteList;
 
