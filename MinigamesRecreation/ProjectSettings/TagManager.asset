@@ -3,7 +3,20 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Top
+  - Right
+  - Bottom
+  - Left
+  - BlackBox
+  - BlackBobOmb
+  - PinkBobOmb
+  - BobOmb
+  - PinkBox
+  - Spawner
+  - TrampolineTT
+  - FloorWallTT
+  - DeathZone
   layers:
   - Default
   - TransparentFX
@@ -11,7 +24,7 @@ TagManager:
   - 
   - Water
   - UI
-  - 
+  - Game
   - 
   - 
   - 

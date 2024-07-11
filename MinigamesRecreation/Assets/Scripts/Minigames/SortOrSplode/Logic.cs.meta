@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: 966ec038baa67d44cb24a4a6a94d04f1
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - BobOmb: {fileID: 8997562415870390385, guid: ed262d1fff17ed64898ab564fcb0a47a, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
