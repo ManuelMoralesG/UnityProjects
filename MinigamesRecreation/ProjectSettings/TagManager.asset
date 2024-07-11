@@ -14,6 +14,9 @@ TagManager:
   - BobOmb
   - PinkBox
   - Spawner
+  - TrampolineTT
+  - FloorWallTT
+  - DeathZone
   layers:
   - Default
   - TransparentFX
