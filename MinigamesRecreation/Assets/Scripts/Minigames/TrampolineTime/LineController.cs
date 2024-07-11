@@ -5,7 +5,7 @@ using UnityEngine;
 public class LineController : MonoBehaviour
 {   
     private float timeLeft = 6.0f;
-    public LineDrawer lineDrawer;
+    [SerializeField] public LineDrawer lineDrawer;
     public bool isFinishedDrawing = false;
     // Start is called before the first frame update
     void Start()

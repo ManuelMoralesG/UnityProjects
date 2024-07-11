@@ -33,7 +33,7 @@ public class LogicTrampolineTime : MonoBehaviour
         yield return new WaitForSeconds(Interval);
 
         if (noJumpers < 4) {
-            Instantiate(Jumper, new Vector2(-7.45f, 3.2f), Quaternion.identity);
+            Instantiate(Jumper, new Vector2(-7.385f, 0.0f), Quaternion.identity);
             noJumpers++;
         }
 

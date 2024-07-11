@@ -8,6 +8,7 @@ public class JumperController : MonoBehaviour
     [SerializeField] private GameObject Spawner;
     private LogicTrampolineTime LogicTT;
     private Rigidbody2D RB2D;
+    [SerializeField] private LineDrawer lineDrawer;
     // Start is called before the first frame update
     void Start()
     {
@@ -27,7 +28,6 @@ public class JumperController : MonoBehaviour
     private IEnumerator Launch(float LaunchTime) {
         yield return new WaitForSeconds(LaunchTime);
 
-        Debug.Log("Launched!");
         RB2D.AddForce(new Vector2(Random.Range(1, 3), Random.Range(3, 5)) * 120);
     }
 
@@ -38,5 +38,17 @@ public class JumperController : MonoBehaviour
             LogicTT.LivesLeftDisplay.text = LogicTT.livesLeft.ToString();
             Destroy(gameObject);
         }
+
     }
+
+    void OnTriggerEnter2D(Collider2D collision) {
+        if (collision.gameObject.CompareTag("TrampolineTT")) {
+            float width = collision.gameObject.GetComponent<Collider2D>().bounds.size.x;
+            RB2D.AddForce(new Vector2(0.0f, 5.5f) * 50 * (width * 0.1f + 3.0f));
+
+            lineDrawer.noLines -= 1;
+            Destroy(collision.gameObject);
+        }
+    }
+    
 }

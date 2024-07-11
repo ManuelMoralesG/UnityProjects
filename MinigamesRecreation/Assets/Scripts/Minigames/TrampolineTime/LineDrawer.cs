@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -12,6 +13,7 @@ public class LineDrawer : MonoBehaviour
     public EdgeCollider2D EC2D;
     public LineController lineControllerScript;
     [SerializeField] public int noLines = 0;
+    public float width;
 
     // Start is called before the first frame update
     void Start()
@@ -37,12 +39,20 @@ public class LineDrawer : MonoBehaviour
             mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             mousePos.z = 0;
 
-            if (length > 1.0f) {
-                line.SetPosition(1, mousePos);
-                UpdateCollider(line, EC2D);
-                line = null;
-                lineControllerScript.isFinishedDrawing = true;
-                noLines++;
+            if (length > 1.0) {
+                Vector3 direction = line.GetPosition(1) - line.GetPosition(0);
+                float slope = direction.y / direction.x;
+
+                if (Math.Abs(slope) > 0.85) {
+                    Destroy(lineObject);
+                } else {    
+                    line.SetPosition(1, mousePos);
+                    UpdateCollider(line, EC2D);
+                    line = null;
+                    lineControllerScript.isFinishedDrawing = true;
+                    noLines++;
+                }
+                
             } else {
                 Destroy(lineObject);
             }
@@ -53,7 +63,7 @@ public class LineDrawer : MonoBehaviour
             line.SetPosition(1, mousePos);
 
             float length = Vector3.Distance(line.GetPosition(0), line.GetPosition(1));
-            float width = 0.15f + length * 0.02f;
+            width = 0.15f + length * 0.02f;
 
             line.startWidth = width;
             line.endWidth = width;
