@@ -11,7 +11,7 @@ public class LogicTrampolineTime : MonoBehaviour
     public bool isGameOver = false;
     private bool isPaused = false;
     [SerializeField] private TMP_Text ScoreDisplay;
-    [SerializeField] private TMP_Text ScoreDisplayInGame;
+    [SerializeField] public TMP_Text ScoreDisplayInGame;
     [SerializeField] public TMP_Text LivesLeftDisplay;
     public int livesLeft = 3;
     public int successfullJumps = 0;
@@ -19,6 +19,10 @@ public class LogicTrampolineTime : MonoBehaviour
     [SerializeField] private GameObject Jumper;
     private float spawnInterval = 4.3f;
     public float noJumpers = 0;
+    [SerializeField] private GameObject topWinZone;
+    [SerializeField] private GameObject bottomWinZone;
+    public SpriteRenderer TopWinSR;
+    public SpriteRenderer BottomWinSR;
 
     // Start is called before the first frame update
     void Start()
@@ -26,7 +30,11 @@ public class LogicTrampolineTime : MonoBehaviour
         GameOverMenuUI.SetActive(false);
         PauseMenuUI.SetActive(false);
 
+        TopWinSR = topWinZone.GetComponent<SpriteRenderer>();
+        BottomWinSR = bottomWinZone.GetComponent<SpriteRenderer>();
+
         StartCoroutine(spawnJumper(spawnInterval, Jumper));
+        InvokeRepeating("ChangeWinZones", 5.0f, 5.5f);
     }
 
     private IEnumerator spawnJumper(float Interval, GameObject Jumper) {
@@ -42,7 +50,7 @@ public class LogicTrampolineTime : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    {
+    {   
         // Pausa el juego
         if (Input.GetKeyDown(KeyCode.Escape)) 
         {
@@ -57,6 +65,20 @@ public class LogicTrampolineTime : MonoBehaviour
 
         if (livesLeft <= 0) {
             GameOver();
+        }
+    }
+
+    void ChangeWinZones() {
+        if (TopWinSR.enabled) {
+            TopWinSR.enabled = false;
+        } else if (!TopWinSR.enabled) {
+            TopWinSR.enabled = true;
+        }
+
+        if (BottomWinSR.enabled) {
+            BottomWinSR.enabled = false;
+        } else if (!BottomWinSR.enabled) {
+            BottomWinSR.enabled = true;
         }
     }
 

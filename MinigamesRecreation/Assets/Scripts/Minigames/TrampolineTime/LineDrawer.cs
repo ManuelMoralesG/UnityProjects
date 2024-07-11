@@ -14,6 +14,7 @@ public class LineDrawer : MonoBehaviour
     public LineController lineControllerScript;
     [SerializeField] public int noLines = 0;
     public float width;
+    public float slope;
 
     // Start is called before the first frame update
     void Start()
@@ -41,7 +42,8 @@ public class LineDrawer : MonoBehaviour
 
             if (length > 1.0) {
                 Vector3 direction = line.GetPosition(1) - line.GetPosition(0);
-                float slope = direction.y / direction.x;
+                slope = direction.y / direction.x;
+                Debug.Log(slope);
 
                 if (Math.Abs(slope) > 0.85) {
                     Destroy(lineObject);
@@ -61,6 +63,12 @@ public class LineDrawer : MonoBehaviour
             mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             mousePos.z = 0;
             line.SetPosition(1, mousePos);
+
+            // Calculate slope based on current positions
+            Vector3 direction = mousePos - line.GetPosition(0);
+            slope = direction.y / direction.x;
+
+            lineControllerScript.slope = slope; // Update slope in LineController
 
             float length = Vector3.Distance(line.GetPosition(0), line.GetPosition(1));
             width = 0.15f + length * 0.02f;

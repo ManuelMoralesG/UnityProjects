@@ -15,8 +15,8 @@ TagManager:
   - PinkBox
   - Spawner
   - TrampolineTT
-  - FloorWallTT
   - DeathZone
+  - WinZone
   layers:
   - Default
   - TransparentFX

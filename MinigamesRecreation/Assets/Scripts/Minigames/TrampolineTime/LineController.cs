@@ -6,7 +6,9 @@ public class LineController : MonoBehaviour
 {   
     private float timeLeft = 6.0f;
     [SerializeField] public LineDrawer lineDrawer;
+    public float slope = 0.0f;
     public bool isFinishedDrawing = false;
+
     // Start is called before the first frame update
     void Start()
     {
