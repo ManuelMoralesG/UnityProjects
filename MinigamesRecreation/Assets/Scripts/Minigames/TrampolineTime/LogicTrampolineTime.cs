@@ -17,8 +17,9 @@ public class LogicTrampolineTime : MonoBehaviour
     public int successfullJumps = 0;
 
     [SerializeField] private GameObject Jumper;
-    private float spawnInterval = 4.3f;
+    private float spawnInterval = 1.0f;
     public float noJumpers = 0;
+    private float spawnedJumpers = 0;
     [SerializeField] private GameObject topWinZone;
     [SerializeField] private GameObject bottomWinZone;
     public SpriteRenderer TopWinSR;
@@ -34,15 +35,25 @@ public class LogicTrampolineTime : MonoBehaviour
         BottomWinSR = bottomWinZone.GetComponent<SpriteRenderer>();
 
         StartCoroutine(spawnJumper(spawnInterval, Jumper));
-        InvokeRepeating("ChangeWinZones", 5.0f, 5.5f);
+        InvokeRepeating("ChangeWinZones", 5.0f, 9.5f);
     }
 
     private IEnumerator spawnJumper(float Interval, GameObject Jumper) {
         yield return new WaitForSeconds(Interval);
 
+        spawnedJumpers++;
+
         if (noJumpers < 4) {
             Instantiate(Jumper, new Vector2(-7.385f, 0.0f), Quaternion.identity);
             noJumpers++;
+        }
+
+        Interval = 10f;
+
+        if (spawnedJumpers >= 4) {
+            Interval = 7f;
+        } else if (spawnedJumpers >= 10) {
+            Interval = 5.5f;
         }
 
         StartCoroutine(spawnJumper(Interval, Jumper));

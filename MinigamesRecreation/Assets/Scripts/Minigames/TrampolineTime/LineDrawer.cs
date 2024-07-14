@@ -40,12 +40,13 @@ public class LineDrawer : MonoBehaviour
             mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             mousePos.z = 0;
 
-            if (length > 1.0) {
+            if (length > 1.25) {
                 Vector3 direction = line.GetPosition(1) - line.GetPosition(0);
                 slope = direction.y / direction.x;
-                Debug.Log(slope);
+                Debug.Log(Math.Abs(slope));
 
-                if (Math.Abs(slope) > 0.85) {
+                if (Math.Abs(slope) > 1.45) {
+                    lineControllerScript.isFinishedDrawing = true;
                     Destroy(lineObject);
                 } else {    
                     line.SetPosition(1, mousePos);
@@ -64,11 +65,10 @@ public class LineDrawer : MonoBehaviour
             mousePos.z = 0;
             line.SetPosition(1, mousePos);
 
-            // Calculate slope based on current positions
             Vector3 direction = mousePos - line.GetPosition(0);
             slope = direction.y / direction.x;
 
-            lineControllerScript.slope = slope; // Update slope in LineController
+            lineControllerScript.slope = slope; 
 
             float length = Vector3.Distance(line.GetPosition(0), line.GetPosition(1));
             width = 0.15f + length * 0.02f;

@@ -10,6 +10,7 @@ public class JumperController : MonoBehaviour
     private Rigidbody2D RB2D;
     private BoxCollider2D BC2D;
     [SerializeField] private LineDrawer lineDrawer;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -48,7 +49,7 @@ public class JumperController : MonoBehaviour
             float width = collision.gameObject.GetComponent<Collider2D>().bounds.size.x;
             LineController LC = collision.gameObject.GetComponent<LineController>();
 
-            RB2D.AddForce(new Vector2(-LC.slope, 5.5f) * 50 * (width * 0.1f + 3.0f));
+            RB2D.AddForce(new Vector2((-LC.slope) * 2f, 5.5f) * 50 * (width * 0.1f + 3.0f));
 
             lineDrawer.noLines -= 1;
             Destroy(collision.gameObject);
@@ -62,8 +63,9 @@ public class JumperController : MonoBehaviour
                 LogicTT.ScoreDisplayInGame.text = LogicTT.successfullJumps.ToString();
                 LogicTT.noJumpers --;
                 Destroy(gameObject);
-            } else {
+            } else if (!SR.enabled) {
                 RB2D.isKinematic = true;
+                RB2D.isKinematic = false;
                 StartCoroutine(ReJump(2));
             }
         }
@@ -72,8 +74,7 @@ public class JumperController : MonoBehaviour
     private IEnumerator ReJump(float Interval) {
         yield return new WaitForSeconds(Interval);
 
-        RB2D.isKinematic = false;
-        RB2D.AddForce(new Vector2(-3f, 1.5f) * 120);
+        RB2D.AddForce(new Vector2(-2.5f, 2.5f) * 120);
     }
     
 }
